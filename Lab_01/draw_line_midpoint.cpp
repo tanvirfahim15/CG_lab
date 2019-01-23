@@ -255,7 +255,7 @@ void drawline_midpoint_zone6(int x_0,int y_0, int x_1, int y_1){
     int dx = x_1 - x_0;
     int dy = y_1 - y_0;
     int d = dy+2*dx;
-    int de = 2*dx;
+    int ds = 2*dx;
     int dse = 2*(dy+dx);
     int x,y;
     x= x_0;
@@ -265,7 +265,7 @@ void drawline_midpoint_zone6(int x_0,int y_0, int x_1, int y_1){
     while(y>y_1){
         if(d<0){
             y--;
-            d+=de;
+            d+=ds;
         }
         else{
             x++;
