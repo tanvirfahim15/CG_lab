@@ -1,3 +1,5 @@
+// Md. Tanvir Alam
+// ROll 61
 #ifdef _WIN32
 #include <windows.h>
 #pragma comment(lib,"OpenGL32.lib")
@@ -21,6 +23,7 @@ int Wi=640, He=480;
 
 //##############################Define Variables here###########################
 
+int x_0,x_1,y_0,y_1;
 
 //##############################################################################
 
@@ -33,8 +36,7 @@ void draw_grid(void);
 int get_zone(int x_0,int y_0, int x_1, int y_1);
 void drawline_midpoint(int x_0,int y_0, int x_1, int y_1,int zone);
 void draw_vertex(int x, int y, int zone);
-void draw_circle(int x,int y,int r);
-void draw_line(int x_0,int y_0, int x_1, int y_1);
+void drawline(void);
 //##############################################################################
 
 void myInit (void){
@@ -50,6 +52,7 @@ void reshape (int w, int h){
     glLoadIdentity ();
 }
 
+// draws the grid
 void draw_grid(void){
     glBegin(GL_LINES);
     glVertex2i(-320,0);
@@ -68,67 +71,58 @@ void display(){
     glColor3f(1.0, 1.0, 1.0);
     glBegin(GL_POINTS);
 
-    int n = 5000;
-    for (int i = 0;i<n;i++){
-        int x = (rand()%400)-200;
-        int y = (rand()%400)-200;
-        int r = (rand()%40);
-        draw_circle(x,y,r);
-    }
+    drawline();
 
     glEnd();
     glFlush();
 }
 
-void draw_circle(int x_0,int y_0,int r){
-    int lines = 30/6;
-    double interval = (double)360/lines;
-    double degree=0;
-    int x=x_0+r,y=y_0;
-    for(int i = 0;i<=lines;i++){
-        draw_line(x_0,y_0,x,y);
-        x=x_0+ r*cos((double)degree/180*3.1416);
-        y=y_0+ r*sin((double)degree/180*3.1416);
-        degree+=interval;
+
+//draws line by using midpoint line drawing algorithm for zone 0 after necessary transformation
+//uses different colors for different zones
+void drawline(){
+    int n = 50; //number of lines
+    for (int i = 0;i<n;i++){
+        x_0 = (rand()%800)-400;
+        y_0 = (rand()%800)-400;
+        x_1 = (rand()%800)-400;
+        y_1 = (rand()%800)-400;
+        if (get_zone(x_0,y_0,x_1,y_1) == 0){
+            glColor3f(1.0, 0.0, 0.0);
+            drawline_midpoint(x_0,y_0,x_1,y_1, 0);
+        }
+        if (get_zone(x_0,y_0,x_1,y_1) == 1){
+            glColor3f(0.0, 1.0, 0.0);
+            drawline_midpoint(y_0,x_0,y_1,x_1,1);
+        }
+        if (get_zone(x_0,y_0,x_1,y_1) == 2){
+            glColor3f(0.0, 0.0, 1.0);
+            drawline_midpoint(y_0,-x_0,y_1,-x_1,2);
+        }
+        if (get_zone(x_0,y_0,x_1,y_1) == 3){
+            glColor3f(0.0, 0.0, 1.0);
+            drawline_midpoint(-x_0,y_0,-x_1,y_1,3);
+        }
+        if (get_zone(x_0,y_0,x_1,y_1) == 4){
+            glColor3f(1.0, 1.0, 1.0);
+            drawline_midpoint(-x_0,-y_0,-x_1,-y_1,4);
+        }
+        if (get_zone(x_0,y_0,x_1,y_1) == 5){
+            glColor3f(1.0, 0.0, 1.0);
+            drawline_midpoint(-y_0,-x_0,-y_1,-x_1,5);
+        }
+        if (get_zone(x_0,y_0,x_1,y_1) == 6){
+            glColor3f(0.0, 1.0, 1.0);
+            drawline_midpoint(-y_0,x_0,-y_1,x_1,6);
+        }
+        if (get_zone(x_0,y_0,x_1,y_1) == 7){
+            glColor3f(1.0, 1.0, 0.0);
+            drawline_midpoint(x_0,-y_0,x_1,-y_1,7);
+        }
     }
 }
 
-void draw_line(int x_0,int y_0, int x_1, int y_1){
-
-    if (get_zone(x_0,y_0,x_1,y_1) == 0){
-        glColor3f(1.0, 0.0, 0.0);
-        drawline_midpoint(x_0,y_0,x_1,y_1, 0);
-    }
-    if (get_zone(x_0,y_0,x_1,y_1) == 1){
-        glColor3f(0.0, 1.0, 0.0);
-        drawline_midpoint(y_0,x_0,y_1,x_1,1);
-    }
-    if (get_zone(x_0,y_0,x_1,y_1) == 2){
-        glColor3f(0.0, 0.0, 1.0);
-        drawline_midpoint(y_0,-x_0,y_1,-x_1,2);
-    }
-    if (get_zone(x_0,y_0,x_1,y_1) == 3){
-        glColor3f(0.0, 0.0, 1.0);
-        drawline_midpoint(-x_0,y_0,-x_1,y_1,3);
-    }
-    if (get_zone(x_0,y_0,x_1,y_1) == 4){
-        glColor3f(1.0, 1.0, 1.0);
-        drawline_midpoint(-x_0,-y_0,-x_1,-y_1,4);
-    }
-    if (get_zone(x_0,y_0,x_1,y_1) == 5){
-        glColor3f(1.0, 0.0, 1.0);
-        drawline_midpoint(-y_0,-x_0,-y_1,-x_1,5);
-    }
-    if (get_zone(x_0,y_0,x_1,y_1) == 6){
-        glColor3f(0.0, 1.0, 1.0);
-        drawline_midpoint(-y_0,x_0,-y_1,x_1,6);
-    }
-    if (get_zone(x_0,y_0,x_1,y_1) == 7){
-        glColor3f(1.0, 1.0, 0.0);
-        drawline_midpoint(x_0,-y_0,x_1,-y_1,7);
-    }
-}
-
+//midpoint line drawing algorithm for zone 0
 void drawline_midpoint(int x_0,int y_0, int x_1, int y_1, int zone){
     int dx = x_1 - x_0;
     int dy = y_1 - y_0;
@@ -154,6 +148,7 @@ void drawline_midpoint(int x_0,int y_0, int x_1, int y_1, int zone){
     }
 }
 
+//draws the pixel using 8 way symmetry
 void draw_vertex(int x, int y, int zone){
     if(zone==0)
         glVertex2i(x,y);
@@ -174,6 +169,7 @@ void draw_vertex(int x, int y, int zone){
 
 }
 
+// returns the zone of a line
 int get_zone(int x_0,int y_0, int x_1, int y_1){
     int dx = x_1 - x_0;
     int dy = y_1 -y_0;
@@ -205,7 +201,7 @@ int get_zone(int x_0,int y_0, int x_1, int y_1){
 }
 
 int main (int argc, char **argv){
-    freopen ("input.txt","r",stdin);
+    //freopen ("input.txt","r",stdin);
     srand(time(NULL));
     //#############Take Inputs###############
 
