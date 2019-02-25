@@ -31,18 +31,6 @@ int bottom = 4;
 int right_ = 2;
 int left_ = 1;
 
-class Point {
-
-public:
-    int x, y;
-    Point(int x1, int y1)
-    {
-        x = x1;
-        y = y1;
-    }
-
-};
-
 //##############################################################################
 
 
@@ -54,9 +42,10 @@ void draw_grid(void);
 int get_zone(int x_0,int y_0, int x_1, int y_1);
 void drawline_midpoint(int x_0,int y_0, int x_1, int y_1,int zone);
 void draw_vertex(int x, int y, int zone);
+void draw_circle(int x,int y,int r);
 void draw_line(int x_0,int y_0, int x_1, int y_1);
-void clipline_cyrus_beak(int x0,int y0,int x1,int y1);
-Point find_t(Point p0,Point p1, float t);
+int makecode(int x,int y);
+void clipLine_cohen_sutherland(int x0, int y0, int x1, int y1);
 //##############################################################################
 
 void myInit (void){
@@ -87,18 +76,13 @@ void draw_grid(void){
     glEnd();
 }
 
-Point find_t(Point p0,Point p1, float t){
-    return Point((int)(p0.x+t*(p1.x-p0.x)),(int)(p0.y+t*(p1.y-p0.y)));
-}
 //generates rand integers for origin and radius of circles and draws them
 void display(){
     glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(0.2, 0.2, 0.2);
+    glColor3f(1.0,1.0,1.0);
 
     draw_grid();
 
-    glColor3f(1.0, 1.0, 1.0);
-    glBegin(GL_POINTS);
 
     if(true){
         for (int i=0;i<100;i++){
@@ -106,91 +90,147 @@ void display(){
             int x1 = (rand()%(2*maxx))-maxx;
             int y0 = (rand()%(2*maxy))-maxy;
             int y1 = (rand()%(2*maxy))-maxy;
-            clipline_cyrus_beak(x0,y0,x1,y1);
+            clipLine_cohen_sutherland(x0,y0,x1,y1);
         }
     }
 
-    glEnd();
+clipLine_cohen_sutherland(-170,70,-120,140);
+
     glFlush();
 }
 
-void clipline_cyrus_beak(int x0,int y0,int x1,int y1){
-    float t,temax = 0.0,tlmin = 1.0;
+void clipLine_cohen_sutherland(int x0, int y0, int x1, int y1){
+    /*glPointSize(3);
+    glColor3f(1.0,1.0,1.0);
 
-    t = -(float)(y0-100)/(y1-y0);
-    if(y1-y0>=0){
-        tlmin = min(tlmin,t);
-    } else{
-        temax = max(temax,t);
+    glBegin(GL_POINTS);
+    glVertex2i(x0,y0);
+    glVertex2i(x1,y1);
+    glEnd();*/
+    glPointSize(1);
+    glBegin(GL_POINTS);
+
+
+    int x0_ = x0;
+    int x1_ = x1;
+    int y0_ = y0;
+    int y1_ = y1;
+    int code0,code1;
+    code0 = makecode(x0,y0);
+    code1 = makecode(x1,y1);
+    while(1){
+
+        if((code0|code1)==0){
+
+            glEnd();
+            glPointSize(5);
+            glColor3f(1.0,1.0,1.0);
+
+            glBegin(GL_POINTS);
+            glVertex2i(x0,y0);
+            glVertex2i(x1,y1);
+            glEnd();
+
+            glPointSize(1);
+
+            glColor3f(1.0, 1.0, 0.0);
+            glBegin(GL_POINTS);
+            draw_line(x0,y0,x1,y1);
+            break;
+        } else if(code0&code1){
+            glColor3f(1.0, 0.0, 0.0);
+            draw_line(x0_,y0_,x1_,y1_);
+            break;
+        }
+        else{
+            int code,x,y;
+            if(code0){
+                code = code0;
+            } else{
+                code  = code1;
+            }
+            if(code&top){
+                y = 100;
+                x = x0+ (y-y0)*(x1 - x0)/(y1-y0);
+
+            }
+            else if(code&bottom){
+                y = -100;
+                x = x0+ (y-y0)*(x1 - x0)/(y1-y0);
+            }
+            else if(code&right_){
+                x = 140;
+                y = y0+ (x-x0)*(y1 - y0)/(x1-x0);
+            }
+            else if(code&left_){
+                x = -140;
+                y = y0+ (x-x0)*(y1 - y0)/(x1-x0);
+            }
+
+            if(code==code0){
+                glColor3f(0.5, 0.5, 0.5);
+                draw_line(x0,y0,x,y);
+                x0 = x;
+                y0 = y;
+                code0 = makecode(x0,y0);
+            }
+            else{
+                glColor3f(0.5, 0.5, 0.5);
+                draw_line(x1,y1,x,y);
+                x1 = x;
+                y1 = y;
+                code1 = makecode(x1,y1);
+            }
+        }
     }
-
-    t = -(float)(y0-(-100))/(y1-y0);
-    if(-(y1-y0)>=0){
-        tlmin = min(tlmin,t);
-    } else{
-        temax = max(temax,t);
-    }
-
-    t = -(float)(x0-140)/(x1-x0);
-    if((x1-x0)>=0){
-        tlmin = min(tlmin,t);
-
-    } else{
-        temax = max(temax,t);
-    }
-
-    t = -(float)(x0-(-140))/(x1-x0);
-    if(-(x1-x0)>=0){
-        tlmin = min(tlmin,t);
-    } else{
-        temax = max(temax,t);
-    }
-    cout<<tlmin<<endl;
-    cout<<temax<<endl;
-
-    if(tlmin<=1.0 && temax>=0.0 && tlmin>=temax){
-        Point p0 = find_t(Point(x0,y0),Point(x1,y1),tlmin);
-        Point p1 = find_t(Point(x0,y0),Point(x1,y1),temax);
-        draw_line(p0.x,p0.y,p1.x,p1.y);
-    }
-
+    glEnd();
 }
+
+int makecode(int x,int y){
+    int code = 0;
+
+    if(y>100){
+        code+=top;
+    }
+    else if(y<-100){
+        code+=bottom;
+    }
+    if(x>140){
+        code+=right_;
+    }
+    else if(x<-140){
+        code+=left_;
+    }
+    return code;
+}
+
 
 //draws line by using midpoint line drawing algorithm for zone 0 after necessary transformation
 //uses different colors for different zones
 void draw_line(int x_0,int y_0, int x_1, int y_1){
-    cout<<"drawing "<<x_0<<" "<<y_0<<" "<<x_1<<" "<<y_1<<endl;
 
     if (get_zone(x_0,y_0,x_1,y_1) == 0){
-        glColor3f(1.0, 0.0, 0.0);
         drawline_midpoint(x_0,y_0,x_1,y_1, 0);
     }
     if (get_zone(x_0,y_0,x_1,y_1) == 1){
-        glColor3f(0.0, 1.0, 0.0);
         drawline_midpoint(y_0,x_0,y_1,x_1,1);
     }
     if (get_zone(x_0,y_0,x_1,y_1) == 2){
-        glColor3f(0.5, 0.5, 0.5);
         drawline_midpoint(y_0,-x_0,y_1,-x_1,2);
     }
     if (get_zone(x_0,y_0,x_1,y_1) == 3){
-        glColor3f(0.0, 0.0, 1.0);
         drawline_midpoint(-x_0,y_0,-x_1,y_1,3);
     }
     if (get_zone(x_0,y_0,x_1,y_1) == 4){
-        glColor3f(1.0, 1.0, 1.0);
         drawline_midpoint(-x_0,-y_0,-x_1,-y_1,4);
     }
     if (get_zone(x_0,y_0,x_1,y_1) == 5){
-        glColor3f(1.0, 0.0, 1.0);
         drawline_midpoint(-y_0,-x_0,-y_1,-x_1,5);
     }
     if (get_zone(x_0,y_0,x_1,y_1) == 6){
-        glColor3f(0.0, 1.0, 1.0);
         drawline_midpoint(-y_0,x_0,-y_1,x_1,6);
     }
     if (get_zone(x_0,y_0,x_1,y_1) == 7){
-        glColor3f(1.0, 1.0, 0.0);
         drawline_midpoint(x_0,-y_0,x_1,-y_1,7);
     }
 }

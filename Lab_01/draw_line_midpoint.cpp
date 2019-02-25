@@ -260,7 +260,7 @@ void drawline_midpoint_zone6(int x_0,int y_0, int x_1, int y_1){
     int x,y;
     x= x_0;
     y= y_0;
-
+    cout<<x<<" "<<y<<endl;
     glVertex2i(x,y);
     while(y>y_1){
         if(d<0){
@@ -272,6 +272,7 @@ void drawline_midpoint_zone6(int x_0,int y_0, int x_1, int y_1){
             y--;
             d+=dse;
         }
+        cout<<x<<" "<<y<<endl;
         glVertex2i(x,y);
     }
 }
