@@ -131,7 +131,8 @@ void reshape (int w, int h){
     glViewport (0, 0, (GLsizei) w, (GLsizei) h);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
-    gluOrtho2D (-Wi/2, Wi/2-1, -He/2, He/2-1); // size of projection plane (origin at the center)
+    //gluOrtho2D (-Wi/2, Wi/2-1, -He/2, He/2-1); // size of projection plane (origin at the center)
+    gluOrtho2D (-5, 74, -5, 54);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
 }

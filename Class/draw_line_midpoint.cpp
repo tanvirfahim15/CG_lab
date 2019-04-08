@@ -112,6 +112,7 @@ void drawline_midpoint_zone0(int x_0,int y_0, int x_1, int y_1){
     y= y_0;
 
     glVertex2i(x,y);
+    cout<<x<<" "<<y<<" "<<d<<endl;
     while(x<x_1){
         if(d<0){
             x++;
@@ -123,6 +124,7 @@ void drawline_midpoint_zone0(int x_0,int y_0, int x_1, int y_1){
             d+=den;
         }
         glVertex2i(x,y);
+        cout<<x<<" "<<y<<" "<<d<<endl;
     }
 }
 
@@ -137,6 +139,7 @@ void drawline_midpoint_zone1(int x_0,int y_0, int x_1, int y_1){
     y= y_0;
 
     glVertex2i(x,y);
+    cout<<x<<" "<<y<<" "<<d<<endl;
     while(y<y_1){
         if(d<0){
             x++;
@@ -148,6 +151,7 @@ void drawline_midpoint_zone1(int x_0,int y_0, int x_1, int y_1){
             d+=dn;
         }
         glVertex2i(x,y);
+        cout<<x<<" "<<y<<" "<<d<<endl;
     }
 }
 
@@ -162,6 +166,7 @@ void drawline_midpoint_zone2(int x_0,int y_0, int x_1, int y_1){
     y= y_0;
 
     glVertex2i(x,y);
+    cout<<x<<" "<<y<<" "<<d<<endl;
     while(y<y_1){
         if(d<0){
             y++;
@@ -173,6 +178,7 @@ void drawline_midpoint_zone2(int x_0,int y_0, int x_1, int y_1){
             d+=dwn;
         }
         glVertex2i(x,y);
+        cout<<x<<" "<<y<<" "<<d<<endl;
     }
 }
 
@@ -185,8 +191,9 @@ void drawline_midpoint_zone3(int x_0,int y_0, int x_1, int y_1){
     int x,y;
     x= x_0;
     y= y_0;
-
+    cout<<d<<" "<<dw<<" "<<dnw<<endl<<endl;
     glVertex2i(x,y);
+    cout<<x<<" "<<y<<" "<<d<<endl;
     while(x>x_1){
         if(d<0){
             x--;
@@ -198,12 +205,14 @@ void drawline_midpoint_zone3(int x_0,int y_0, int x_1, int y_1){
             d+=dw;
         }
         glVertex2i(x,y);
+        cout<<x<<" "<<y<<" "<<d<<endl;
     }
 }
 
 void drawline_midpoint_zone4(int x_0,int y_0, int x_1, int y_1){
     int dx = x_1 - x_0;
     int dy = y_1 - y_0;
+
     int d = -2*dy+dx;
     int dw = -2*dy;
     int dsw = 2*(dx-dy);
@@ -212,6 +221,8 @@ void drawline_midpoint_zone4(int x_0,int y_0, int x_1, int y_1){
     y= y_0;
 
     glVertex2i(x,y);
+    cout<<x<<" "<<y<<" "<<d<<endl;
+
     while(x>x_1){
         if(d<0){
             x--;
@@ -223,6 +234,7 @@ void drawline_midpoint_zone4(int x_0,int y_0, int x_1, int y_1){
             d+=dsw;
         }
         glVertex2i(x,y);
+        cout<<x<<" "<<y<<" "<<d<<endl;
     }
 }
 
@@ -237,6 +249,7 @@ void drawline_midpoint_zone5(int x_0,int y_0, int x_1, int y_1){
     y= y_0;
 
     glVertex2i(x,y);
+    cout<<x<<" "<<y<<" "<<d<<endl;
     while(y>y_1){
         if(d<0){
             y--;
@@ -248,6 +261,7 @@ void drawline_midpoint_zone5(int x_0,int y_0, int x_1, int y_1){
             d+=ds;
         }
         glVertex2i(x,y);
+        cout<<x<<" "<<y<<" "<<d<<endl;
     }
 }
 
@@ -260,7 +274,7 @@ void drawline_midpoint_zone6(int x_0,int y_0, int x_1, int y_1){
     int x,y;
     x= x_0;
     y= y_0;
-    cout<<x<<" "<<y<<endl;
+    cout<<x<<" "<<y<<" "<<d<<endl;
     glVertex2i(x,y);
     while(y>y_1){
         if(d<0){
@@ -272,7 +286,7 @@ void drawline_midpoint_zone6(int x_0,int y_0, int x_1, int y_1){
             y--;
             d+=dse;
         }
-        cout<<x<<" "<<y<<endl;
+        cout<<x<<" "<<y<<" "<<d<<endl;
         glVertex2i(x,y);
     }
 }
@@ -288,6 +302,7 @@ void drawline_midpoint_zone7(int x_0,int y_0, int x_1, int y_1){
     y= y_0;
 
     glVertex2i(x,y);
+    cout<<x<<" "<<y<<" "<<d<<endl;
     while(x<x_1){
         if(d<0){
             x++;
@@ -299,6 +314,7 @@ void drawline_midpoint_zone7(int x_0,int y_0, int x_1, int y_1){
             d+=de;
         }
         glVertex2i(x,y);
+        cout<<x<<" "<<y<<" "<<d<<endl;
     }
 }
 
@@ -336,6 +352,8 @@ int get_zone(int x_0,int y_0, int x_1, int y_1){
 int main (int argc, char **argv){
     freopen ("input.txt","r",stdin);
     //#############Take Inputs###############
+
+
     cin>>x_0>>y_0>>x_1>>y_1;
     //#######################################
     glutInit (&argc, argv); // to initialize the toolkit;

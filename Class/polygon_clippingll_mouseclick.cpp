@@ -278,10 +278,19 @@ void draw_grid(void){
 void keyboard(unsigned char key, int x, int y)
 {
     if(key=='q'){
+        for (int i=0;i<points.size();i++){
+            points[i].print();
+        }
+        cout<<endl;
         left_clip();
         right_clip();
         top_clip();
         bottom_clip();
+
+        for (int i=0;i<points.size();i++){
+            points[i].print();
+        }
+        cout<<endl;
         int n =points.size();
         for(int i=0;i<n;i++){counts.push_back(0);}
         for(int i =0;i<points.size();i++){

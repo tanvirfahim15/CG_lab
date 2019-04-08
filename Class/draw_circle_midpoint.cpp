@@ -65,13 +65,7 @@ void display(){
 
     glBegin(GL_POINTS);
 
-    int n = 100; // number of circles
-    for (int i = 0;i<n;i++){
-        int x = (rand()%400)-200;
-        int y = (rand()%400)-200;
-        int r = (rand()%40)+20;
-        draw_circle_0r(x,y,r);
-    }
+    draw_circle_0r(0,0,20);
     glEnd();
     glFlush();
 }
@@ -80,6 +74,7 @@ void draw_circle_0r(int cx,int cy, int r){
     int d = 5-4*r;
     int x = 0, y = r;
     draw_8way(x, y, cx, cy);
+    cout<<x<<" "<<y<<" "<<d<<endl;
     while (x<y){
         if(d<0){
             d+=(8*x+12);
@@ -90,6 +85,7 @@ void draw_circle_0r(int cx,int cy, int r){
             x++;
             y--;
         }
+        cout<<x<<" "<<y<<" "<<d<<endl;
         draw_8way(x,y,cx,cy);
     }
 }

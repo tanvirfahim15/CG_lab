@@ -90,6 +90,7 @@ void reshape (int w, int h){
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     gluOrtho2D (-Wi/2, Wi/2-1, -He/2, He/2-1); // size of projection plane (origin at the center)
+//    gluOrtho2D (-5, 70, -5, 70); // size of projection plane (origin at the center)
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
 }
@@ -118,14 +119,19 @@ void display(){
 void do_fill(){
     for(int y = miny;y<maxy;y++){
         bool par = false;
+        bool print = false;
         for(int x = minx;x<=maxx;x++){
             if(edgeTable[mapy(y)][mapx(x)]){
                 par = !par;
+                print = true;
+                cout<<y<<" "<<x<<endl;
             }
             if(par){
                 glVertex2i(x,y);
             }
         }
+        if(print)
+        cout<<endl;
     }
 
 
@@ -202,6 +208,7 @@ int main (int argc, char **argv){
             x+=m_inv;
         }
     }
+
 
 
 

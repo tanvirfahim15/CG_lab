@@ -76,13 +76,8 @@ struct Line{
     }
 };
 
-Line * createLine(Point p1,Point p2);
-void sortLines(vector<Line*> *lines);
-float get_m_inv(Point p1,Point p2);
-
 struct Edge{
     int y,x;
-    float m_inv;
     Edge *next = NULL;
 };
 
@@ -91,12 +86,11 @@ struct Edget{
     Edge *tail= NULL;
 
 
-    void insert(int y,int x, float m_inv){
+    void insert(int y,int x){
 
         Edge * edge = (Edge*)malloc(sizeof(Edge));
         edge->x=x;
         edge->y=y;
-        edge->m_inv=m_inv;
         edge->next=NULL;
         if(head==NULL){
             head = edge;
@@ -118,16 +112,12 @@ struct Edget{
     void print(){
         Edge* edge = head;
         while(edge!=NULL){
-            cout<<edge->y<<" "<<edge->x<<" "<<edge->m_inv<<endl;
+            cout<<edge->y<<" "<<edge->x<<endl;
             edge = edge->next;
         }
     }
 };
-vector<Edget*> edgeTable;
-vector<Point> points;
-vector<int> counts;
-vector<Line*> lines;
-bool inputDone=0;
+vector<vector<Edget*> > edgeTable;
 //##############################################################################
 
 
@@ -140,6 +130,7 @@ void reshape (int w, int h){
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     gluOrtho2D (-Wi/2, Wi/2-1, -He/2, He/2-1); // size of projection plane (origin at the center)
+    //gluOrtho2D (0, 160, 0, 160);
     glMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
 }
@@ -153,134 +144,44 @@ void draw_grid(void){
     glEnd();
 }
 
-void keyboard(unsigned char key, int x, int y)
-{
-    if(key=='q'){
-
-        int n =points.size();
-        for(int i =0;i<points.size();i++){
-            points[i].print();
-            lines.push_back(createLine(points[i],points[(i+1)%n]));
-            if(points[i].y==points[(i+1)%n].y)continue;
-            if(points[i].y==lines[i]->p1.y){
-                counts[i]++;
-            } else{
-                counts[(i+1)%n]++;
-            }
-        }
-
-
-
-        sortLines(&lines);
-
-        for(int i=0;i<500;i++){
-            Edget *edget = (Edget*)malloc(sizeof(Edget));
-            edget->head =NULL;
-            edget->tail =NULL;
-            edgeTable.push_back(edget);
-        }
-
-        for(int i=0;i<lines.size();i++){
-            if(lines[i]->p1.y==lines[i]->p2.y)continue;
-
-            float m_inv = get_m_inv(lines[i]->p1,lines[i]->p2);
-            float x = (float)lines[i]->p1.x;
-            for (int y = lines[i]->p1.y;y<lines[i]->p2.y;y++){
-                edgeTable[mapy(y)]->insert(y,x,m_inv);
-                x+=m_inv;
-            }
-        }
-
-        inputDone = 1;
-        for (int i=0;i<edgeTable.size();i++){
-            if(edgeTable[i]->head){
-                cout<<i+miny<<": "<<endl;
-                edgeTable[i]->print();
-            }
-        }
-        glutPostRedisplay();
-    }
-    /*switch (key)
-    {
-        case ESCKEY:  // ESC: Quit
-            exit(0);
-            break;
-    }*/
-}
-void mouse(int button, int state, int x, int y) {
-    // Save the left button state
-    if (button == GLUT_LEFT_BUTTON&&state == GLUT_DOWN&&!inputDone) {
-        Point p(x+minx,-y+maxy);
-        points.push_back(p);
-        counts.push_back(0);
-        glutPostRedisplay();
-    }
-}
-
 void display(){
     glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 1.0, 1.0);
 
     draw_grid();
+    glPointSize(1);
 
-
-    if(inputDone){
-        glColor3f(1.0, 1.0, 1.0);
-        glBegin(GL_POINTS);
-        do_fill();
-        glEnd();
-    } else{
-        glColor3f(1.0, 1.0, 1.0);
-
-        glPointSize(5);
-        glBegin(GL_POINTS);
-        for(int i =0;i<points.size();i++){
-            glVertex2i(points[i].x,points[i].y);
-        }
-        glEnd();
-    }
+    glBegin(GL_POINTS);
+    do_fill();
+    glEnd();
     glFlush();
 }
 
 void do_fill(){
 
-    for(int y = miny;y<maxy;y++){
-        bool par = false;
-        Edge* edge = edgeTable[mapy(y)]->head;
+    for (int k = 0;k<edgeTable.size();k++){
+        if(k==0)    glColor3f(0.8, 0.8, 0.8);
+        if(k==1)    glColor3f(0.4, 0.4, 0.4);
+        if(k==2)    glColor3f(0.6, 0.6, 0.6);
 
-        for(int x = minx;x<=maxx;x++){
-            while (edge!=NULL&&edge->x==x){
-                par = !par;
-                edge = edge->next;
-            }
-            if(par){
-                glVertex2i(x,y);
+        for(int y = miny;y<maxy;y++){
+            bool par = false;
+            Edge* edge = edgeTable[k][mapy(y)]->head;
+
+            for(int x = minx;x<=maxx;x++){
+                if(!edge)break;
+                if(edge->x>x&&!par)x = edge->x;
+                while (edge!=NULL&&edge->x==x){
+                    par = !par;
+                    edge = edge->next;
+                }
+                if(par){
+                    glVertex2i(x,y);
+                }
             }
         }
     }
-    glEnd();
-    glPointSize(10);
-    glBegin(GL_POINTS);
 
-    for(int i=0;i<points.size();i++){
-        if(counts[i]==2){
-            glColor3f(0.0, 1.0, 0.0);
-
-        }
-        else if(counts[i]==1){
-            glColor3f(1.0, 0.0, 0.0);
-
-        } else{
-            glColor3f(0.0, 0.0, 1.0);
-
-        }
-        glVertex2i(points[i].x,points[i].y);
-    }
-
-
-    glEnd();
-    glColor3f(1.0, 1.0, 1.0);
-    glPointSize(1);
-    glBegin(GL_POINTS);
 
 
 }
@@ -322,6 +223,56 @@ int main (int argc, char **argv){
     freopen ("input.txt","r",stdin);
     //#############Take Inputs###############
 
+    int m;
+    cin>>m;
+
+    for (int k=0;k<m;k++){
+        vector<Edget*> edgeT;
+        edgeTable.push_back(edgeT);
+        vector<Line*> lines;
+        vector<Point> points;
+        int n ,x,y;
+        cin>>n;
+
+        for (int i=0;i<n;i++){
+            cin>>x>>y;
+            if(x>maxx||x<miny||y>maxy||y<miny){
+                cout<<"Pixel out of window"<<endl;
+            }
+            Point p(x,y);
+            points.push_back(p);
+        }
+
+        for(int i =0;i<points.size();i++){
+            lines.push_back(createLine(points[i],points[(i+1)%n]));
+            if(points[i].y==points[(i+1)%n].y)continue;
+        }
+
+
+
+        sortLines(&lines);
+
+        for(int i=0;i<500;i++){
+            Edget *edget = (Edget*)malloc(sizeof(Edget));
+            edget->head =NULL;
+            edget->tail =NULL;
+            edgeTable[k].push_back(edget);
+        }
+
+        for(int i=0;i<lines.size();i++){
+            if(lines[i]->p1.y==lines[i]->p2.y)continue;
+
+            float m_inv = get_m_inv(lines[i]->p1,lines[i]->p2);
+            float x = (float)lines[i]->p1.x;
+            for (int y = lines[i]->p1.y;y<lines[i]->p2.y;y++){
+                edgeTable[k][mapy(y)]->insert(y,x);
+                x+=m_inv;
+            }
+        }
+    }
+
+
+
 
     //#######################################
     glutInit (&argc, argv); // to initialize the toolkit;
@@ -332,8 +283,6 @@ int main (int argc, char **argv){
     myInit(); // additional initializations as necessary
     glutReshapeFunc(reshape);
     glutDisplayFunc (display);
-    glutKeyboardFunc(keyboard);
-    glutMouseFunc(mouse);
     glutMainLoop(); // go into a loop until event occurs
     return 0;
 }
