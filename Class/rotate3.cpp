@@ -253,21 +253,21 @@ Point* project(Point* p){
     double x,y,z;
     x = (p->x-p->z*cop->x/cop->z +zp*cop->x/cop->z)/(1-p->z/(cop->z-zp)+zp/(cop->z-zp));
     y = (p->y-p->z*cop->y/cop->z +zp*cop->y/cop->z)/(1-p->z/(cop->z-zp)+zp/(cop->z-zp));
-    return create_point(x,y,zp);
 
-    //Matrix* m = projection();
-    //return vector_to_point(multiply(m,point_to_vector(p)));
+    return create_point(x,y,zp);
+    Matrix* m = projection();
+    return vector_to_point(multiply(m,point_to_vector(p)));
 }
-void animate(int axis, int direction){
+void animate(int axis){
 
         for(int j=0;j<polygons.size();j++){
             vector<Point*> points = polygons[j];
             for(int i =0;i<points.size();i++){
                 Point* p1 = points[i];
-                p1 = rotate(p1,axis,direction);
+                p1 = rotate(p1,axis,1);
                 points[i] = p1;
                 Point* p2 = points[(i+1)%points.size()];
-                p2 = rotate(p2,axis,direction);
+                p2 = rotate(p2,axis,1);
                 points[(i+1)%points.size()] = p2;
             }
             polygons[j] = points;
@@ -297,29 +297,11 @@ void display(){
     draw_grid();
 
     glBegin(GL_POINTS);
-    /*
+
     for(int i =0;i<polygons.size();i++){
         if (get_normal(polygons[i])<0)
         draw_polygon(polygons[i]);
     }
-     */
-
-    for(int j=0;j<polygons.size();j++){
-        vector<Point*> points = polygons[j];
-        for(int i =0;i<points.size();i++){
-            Point* p1 = points[i];
-            p1 = project(p1);
-            points[i] = p1;
-            Point* p2 = points[(i+1)%points.size()];
-            p2 = project(p2);
-            points[(i+1)%points.size()] = p2;
-        }
-        if (get_normal(points)<0)
-        draw_polygon(points);
-
-    }
-
-
 
     glEnd();
 
@@ -443,46 +425,19 @@ void keyboard(unsigned char key, int x, int y)
 {
     if(key=='x'){
 
-        animate(0,1);
+        animate(0);
         glutPostRedisplay();
     }
     if(key=='y'){
 
-        animate(1,1);
+        animate(1);
         glutPostRedisplay();
     }
     if(key=='z'){
 
-        animate(2,1);
+        animate(2);
         glutPostRedisplay();
     }
-}
-
-void
-catchKey(int key, int x, int y)
-{
-    if(key == GLUT_KEY_LEFT){
-        animate(1,-1);
-        glutPostRedisplay();
-
-    }
-    else if(key == GLUT_KEY_RIGHT){
-        animate(1,1);
-        glutPostRedisplay();
-
-    }
-    else if(key == GLUT_KEY_DOWN){
-
-        animate(0,1);
-        glutPostRedisplay();
-    }
-
-    else if(key == GLUT_KEY_UP){
-
-        animate(0,-1);
-        glutPostRedisplay();
-    }
-
 }
 
 int main (int argc, char **argv){
@@ -520,7 +475,6 @@ int main (int argc, char **argv){
     glutDisplayFunc (display);
     glutKeyboardFunc(keyboard);
 
-    glutSpecialFunc(catchKey);
     glutMainLoop(); // go into a loop until event occurs
     return 0;
 }
